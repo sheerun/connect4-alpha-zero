@@ -181,7 +181,7 @@ class OptimizeWorker:
         z_list = []
         for state, policy, z in data:
             board = list(state)
-            board = np.reshape(board, (6, 7))
+            board = np.reshape(board, (4, 16))
             env = Connect4Env().update(board)
 
             black_ary, white_ary = env.black_and_white_plane()

@@ -41,7 +41,7 @@ class PlayWithHuman:
     def move_by_human(self, env):
         while True:
             try:
-                movement = input('\nEnter your movement (1, 2, 3, 4, 5, 6, 7): ')
+                movement = input('\nEnter your movement (1-16): ')
                 movement = int(movement) - 1
                 legal_moves = env.legal_moves()
                 if legal_moves[int(movement)] == 1:

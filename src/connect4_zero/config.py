@@ -26,7 +26,7 @@ class Config:
         self.play_data = c.PlayDataConfig()
         self.trainer = c.TrainerConfig()
         self.eval = c.EvaluateConfig()
-        self.n_labels = 7
+        self.n_labels = 16
 
 
 class Options:

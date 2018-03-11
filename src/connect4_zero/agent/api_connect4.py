@@ -8,10 +8,10 @@ class Connect4ModelAPI:
 
     def predict(self, x):
         assert x.ndim in (3, 4)
-        assert x.shape == (2, 6, 7) or x.shape[1:] == (2, 6, 7)
+        assert x.shape == (2, 4, 16) or x.shape[1:] == (2, 4, 16)
         orig_x = x
         if x.ndim == 3:
-            x = x.reshape(1, 2, 6, 7)
+            x = x.reshape(1, 2, 4, 16)
         policy, value = self.agent_model.model.predict_on_batch(x)
 
         if orig_x.ndim == 3:

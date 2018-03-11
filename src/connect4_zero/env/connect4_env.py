@@ -22,9 +22,9 @@ class Connect4Env:
 
     def reset(self):
         self.board = []
-        for i in range(6):
+        for i in range(4):
             self.board.append([])
-            for j in range(7):
+            for j in range(16):
                 self.board[i].append(' ')
         self.turn = 0
         self.done = False
@@ -42,8 +42,8 @@ class Connect4Env:
 
     def turn_n(self):
         turn = 0
-        for i in range(6):
-            for j in range(7):
+        for i in range(4):
+            for j in range(16):
                 if self.board[i][j] != ' ':
                     turn += 1
 
@@ -55,12 +55,14 @@ class Connect4Env:
         else:
             return Player.black
 
+    # action = 0-15
+    # board: level, [height*width]
     def step(self, action):
         if action is None:
             self._resigned()
             return self.board, {}
 
-        for i in range(6):
+        for i in range(4):
             if self.board[i][action] == ' ':
                 self.board[i][action] = ('X' if self.player_turn() == Player.white else 'O')
                 break
@@ -69,7 +71,7 @@ class Connect4Env:
 
         self.check_for_fours()
 
-        if self.turn > 42:
+        if self.turn > 64:
             self.done = True
             if self.winner is None:
                 self.winner = Winner.draw
@@ -77,9 +79,9 @@ class Connect4Env:
         return self.board, {}
 
     def legal_moves(self):
-        legal = [0, 0, 0, 0, 0, 0, 0]
-        for j in range(7):
-            for i in range(6):
+        legal = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        for j in range(16):
+            for i in range(4):
                 if self.board[i][j] == ' ':
                     legal[j] = 1
                     break
@@ -87,106 +89,96 @@ class Connect4Env:
         return legal
 
     def check_for_fours(self):
-        for i in range(6):
-            for j in range(7):
-                if self.board[i][j] != ' ':
-                    # check if a vertical four-in-a-row starts at (i, j)
-                    if self.vertical_check(i, j):
-                        self.done = True
-                        return
+        for a in range(4):
+            for b in range(4):
+                if self.four_check(a, b, 0, 0, 0, 1):
+                    self.done = True
+                    return
+                if self.four_check(a, 0, b, 0, 1, 0):
+                    self.done = True
+                    return
+                if self.four_check(0, a, b, 1, 0, 0):
+                    self.done = True
+                    return
 
-                    # check if a horizontal four-in-a-row starts at (i, j)
-                    if self.horizontal_check(i, j):
-                        self.done = True
-                        return
+        # first corner
+        if self.four_check(0, 0, 0, 0, 1, 1):
+            self.done = True
+            return
+        if self.four_check(0, 0, 0, 1, 1, 0):
+            self.done = True
+            return
+        if self.four_check(0, 0, 0, 1, 0, 1):
+            self.done = True
+            return
+        if self.four_check(0, 0, 0, 1, 1, 1):
+            self.done = True
+            return
 
-                    # check if a diagonal (either way) four-in-a-row starts at (i, j)
-                    diag_fours = self.diagonal_check(i, j)
-                    if diag_fours:
-                        self.done = True
-                        return
+        # second corner
+        if self.four_check(0, 3, 0, 0, -1, 1):
+            self.done = True
+            return
+        if self.four_check(0, 3, 0, 1, -1, 0):
+            self.done = True
+            return
+        if self.four_check(0, 3, 0, 1, 0, 1):
+            self.done = True
+            return
+        if self.four_check(0, 3, 0, 1, -1, 1):
+            self.done = True
+            return
 
-    def vertical_check(self, row, col):
-        # print("checking vert")
+        # third corner
+        if self.four_check(0, 3, 3, 0, -1, -1):
+            self.done = True
+            return
+        if self.four_check(0, 3, 3, 1, -1, 0):
+            self.done = True
+            return
+        if self.four_check(0, 3, 3, 1, 0, -1):
+            self.done = True
+            return
+        if self.four_check(0, 3, 3, 1, -1, -1):
+            self.done = True
+            return
+
+        # fourth corner
+        if self.four_check(0, 0, 3, 0, 1, -1):
+            self.done = True
+            return
+        if self.four_check(0, 0, 3, 1, 1, 0):
+            self.done = True
+            return
+        if self.four_check(0, 0, 3, 1, 0, -1):
+            self.done = True
+            return
+        if self.four_check(0, 0, 3, 1, 1, -1):
+            self.done = True
+            return
+
+
+    def four_check(self, i0, x, y, di, dx, dy):
+        if ' ' == self.board[i0][x + y*4].lower():
+            return False
+
         four_in_a_row = False
         consecutive_count = 0
 
-        for i in range(row, 6):
-            if self.board[i][col].lower() == self.board[row][col].lower():
+        for d in range(4):
+            i = i0 + d*di
+            j = x+d*dx + y*4+d*dy*4
+            if self.board[i][j].lower() == self.board[i0][x + y*4].lower():
                 consecutive_count += 1
             else:
                 break
 
         if consecutive_count >= 4:
             four_in_a_row = True
-            if 'x' == self.board[row][col].lower():
+            if 'x' == self.board[i0][x + y*4].lower():
                 self.winner = Winner.white
             else:
                 self.winner = Winner.black
-
-        return four_in_a_row
-
-    def horizontal_check(self, row, col):
-        four_in_a_row = False
-        consecutive_count = 0
-
-        for j in range(col, 7):
-            if self.board[row][j].lower() == self.board[row][col].lower():
-                consecutive_count += 1
-            else:
-                break
-
-        if consecutive_count >= 4:
-            four_in_a_row = True
-            if 'x' == self.board[row][col].lower():
-                self.winner = Winner.white
-            else:
-                self.winner = Winner.black
-
-        return four_in_a_row
-
-    def diagonal_check(self, row, col):
-        four_in_a_row = False
-        count = 0
-
-        consecutive_count = 0
-        j = col
-        for i in range(row, 6):
-            if j > 6:
-                break
-            elif self.board[i][j].lower() == self.board[row][col].lower():
-                consecutive_count += 1
-            else:
-                break
-            j += 1
-
-        if consecutive_count >= 4:
-            count += 1
-            if 'x' == self.board[row][col].lower():
-                self.winner = Winner.white
-            else:
-                self.winner = Winner.black
-
-        consecutive_count = 0
-        j = col
-        for i in range(row, -1, -1):
-            if j > 6:
-                break
-            elif self.board[i][j].lower() == self.board[row][col].lower():
-                consecutive_count += 1
-            else:
-                break
-            j += 1
-
-        if consecutive_count >= 4:
-            count += 1
-            if 'x' == self.board[row][col].lower():
-                self.winner = Winner.white
-            else:
-                self.winner = Winner.black
-
-        if count > 0:
-            four_in_a_row = True
 
         return four_in_a_row
 
@@ -201,8 +193,8 @@ class Connect4Env:
     def black_and_white_plane(self):
         board_white = np.copy(self.board)
         board_black = np.copy(self.board)
-        for i in range(6):
-            for j in range(7):
+        for i in range(4):
+            for j in range(16):
                 if self.board[i][j] == ' ':
                     board_white[i][j] = 0
                     board_black[i][j] = 0
@@ -218,13 +210,15 @@ class Connect4Env:
     def render(self):
         print("\nRound: " + str(self.turn))
 
-        for i in range(5, -1, -1):
-            print("\t", end="")
-            for j in range(7):
-                print("| " + str(self.board[i][j]), end=" ")
-            print("|")
-        print("\t  _   _   _   _   _   _   _ ")
-        print("\t  1   2   3   4   5   6   7 ")
+
+        for y in range(3, -1, -1):
+            print("\n| ", end="")
+            for i in range(4):
+                for x in range(4):
+                    print(str(self.board[i][y*4+x]), end=" ")
+                print("| ", end="")
+
+        print("\n", end="")
 
         if self.done:
             print("Game Over!")
@@ -237,4 +231,4 @@ class Connect4Env:
 
     @property
     def observation(self):
-        return ''.join(''.join(x for x in y) for y in self.board)
+        return ''

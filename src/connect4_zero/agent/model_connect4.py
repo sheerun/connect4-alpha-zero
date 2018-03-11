@@ -27,7 +27,7 @@ class Connect4Model:
 
     def build(self):
         mc = self.config.model
-        in_x = x = Input((2, 6, 7))  # [own(8x8), enemy(8x8)]
+        in_x = x = Input((2, 4, 16))  # [own(8x8), enemy(8x8)]
 
         # (batch, channels, height, width)
         x = Conv2D(filters=mc.cnn_filter_num, kernel_size=mc.cnn_filter_size, padding="same",
