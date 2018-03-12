@@ -96,6 +96,18 @@ class Connect4Env:
             if self.four_check(a, 3, 0, 0, -1, 1):
                 self.done = True
                 return
+            if self.four_check(0, a, 0, 1, 0, 1):
+                self.done = True
+                return
+            if self.four_check(0, 0, a, 1, 1, 0):
+                self.done = True
+                return
+            if self.four_check(0, a, 3, 1, 0, -1):
+                self.done = True
+                return
+            if self.four_check(0, 3, a, 1, -1, 0):
+                self.done = True
+                return
             for b in range(4):
                 if self.four_check(a, b, 0, 0, 0, 1):
                     self.done = True
