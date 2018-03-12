@@ -120,45 +120,21 @@ class Connect4Env:
                     return
 
         # first corner
-        if self.four_check(0, 0, 0, 1, 1, 0):
-            self.done = True
-            return
-        if self.four_check(0, 0, 0, 1, 0, 1):
-            self.done = True
-            return
         if self.four_check(0, 0, 0, 1, 1, 1):
             self.done = True
             return
 
         # second corner
-        if self.four_check(0, 3, 0, 1, -1, 0):
-            self.done = True
-            return
-        if self.four_check(0, 3, 0, 1, 0, 1):
-            self.done = True
-            return
         if self.four_check(0, 3, 0, 1, -1, 1):
             self.done = True
             return
 
         # third corner
-        if self.four_check(0, 3, 3, 1, -1, 0):
-            self.done = True
-            return
-        if self.four_check(0, 3, 3, 1, 0, -1):
-            self.done = True
-            return
         if self.four_check(0, 3, 3, 1, -1, -1):
             self.done = True
             return
 
         # fourth corner
-        if self.four_check(0, 0, 3, 1, 1, 0):
-            self.done = True
-            return
-        if self.four_check(0, 0, 3, 1, 0, -1):
-            self.done = True
-            return
         if self.four_check(0, 0, 3, 1, 1, -1):
             self.done = True
             return
