@@ -90,6 +90,12 @@ class Connect4Env:
 
     def check_for_fours(self):
         for a in range(4):
+            if self.four_check(a, 0, 0, 0, 1, 1):
+                self.done = True
+                return
+            if self.four_check(a, 3, 0, 0, -1, 1):
+                self.done = True
+                return
             for b in range(4):
                 if self.four_check(a, b, 0, 0, 0, 1):
                     self.done = True
@@ -102,9 +108,6 @@ class Connect4Env:
                     return
 
         # first corner
-        if self.four_check(0, 0, 0, 0, 1, 1):
-            self.done = True
-            return
         if self.four_check(0, 0, 0, 1, 1, 0):
             self.done = True
             return
@@ -116,9 +119,6 @@ class Connect4Env:
             return
 
         # second corner
-        if self.four_check(0, 3, 0, 0, -1, 1):
-            self.done = True
-            return
         if self.four_check(0, 3, 0, 1, -1, 0):
             self.done = True
             return
@@ -130,9 +130,6 @@ class Connect4Env:
             return
 
         # third corner
-        if self.four_check(0, 3, 3, 0, -1, -1):
-            self.done = True
-            return
         if self.four_check(0, 3, 3, 1, -1, 0):
             self.done = True
             return
@@ -144,9 +141,6 @@ class Connect4Env:
             return
 
         # fourth corner
-        if self.four_check(0, 0, 3, 0, 1, -1):
-            self.done = True
-            return
         if self.four_check(0, 0, 3, 1, 1, 0):
             self.done = True
             return
@@ -231,4 +225,4 @@ class Connect4Env:
 
     @property
     def observation(self):
-        return ''
+        return ''.join(''.join(x for x in y) for y in self.board)
